@@ -12,17 +12,17 @@ A PyTorch Implementation of English Text Classification.
 ## Usage
 * Step1: Put train and test data to `./data/` folder.
 * Step2: Download google word2vec to `./resources/` folder and modify `embedding_file` in `settings.ini`.
-* Step2: Adjust hyper parameters in `settings.ini` if necessary.
-* Step3: Generate vocabulary file to the `./results/` folder.
+* Step3: Adjust hyper parameters in `settings.ini` if necessary.
+* Step4: Generate vocabulary file to the `./results/` folder.
 ```
 python main.py --mode preprocess
 ```
-* Step4: Train model.
+* Step5: Train model.
     * Model will be saved in `./models/` folders
 ```
 python main.py --mode train
 ```
-* Step5: Predict labels with saved model.
+* Step6: Predict labels with saved model.
     * `epoch_idx` is the saved model's epoch id.
     * labels will be saved in `./results/` folder.
 ```
