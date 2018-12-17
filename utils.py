@@ -9,7 +9,7 @@ import gensim
 from torch.utils.data import Dataset
 
 PAD = 0
-EMBEDDING_SIZE = 300
+EMBEDDING_SIZE = 100
 
 
 def _clean_str(string):
@@ -104,7 +104,10 @@ def load_data(file, max_len=100, min_count=1, result_dir="results"):
 
 
 def load_embedding(embedding_file, min_count=1, result_dir="results"):
-    word2vec = gensim.models.KeyedVectors.load_word2vec_format(embedding_file, binary=True)
+    try:
+        word2vec = gensim.models.KeyedVectors.load_word2vec_format(embedding_file, binary=True)
+    except Exception:
+        word2vec = gensim.models.KeyedVectors.load_word2vec_format(embedding_file, binary=False)
     with open(os.path.join(result_dir, "vocab.txt"), "r", encoding="utf-8") as fr:
         vocabs = [line.split()[0] for line in fr.readlines() if int(line.split()[1]) >= min_count]
     idx2vocab = {idx: vocab for idx, vocab in enumerate(vocabs)}
