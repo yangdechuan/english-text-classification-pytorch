@@ -58,7 +58,7 @@ def train():
 
     # Build model.
     # model = CNNTextModel(word_embedding=word_embedding, num_classes=NUM_CLASSES)
-    model = LSTMAttention(word_embedding=word_embedding, hidden_dim=300, num_classes=NUM_CLASSES)
+    model = LSTMAttention(word_embedding=word_embedding, hidden_dim=word_embedding.shape[1], num_classes=NUM_CLASSES)
     model.to(device)
 
     # Build optimizer

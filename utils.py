@@ -9,7 +9,7 @@ import gensim
 from torch.utils.data import Dataset
 
 PAD = 0
-EMBEDDING_SIZE = 100
+EMBEDDING_SIZE = 300
 
 
 def _clean_str(string):

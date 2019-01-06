@@ -11,7 +11,7 @@ A PyTorch Implementation of English Text Classification.
 
 ## Usage
 * Step1: Put train and test data to `./data/` folder.
-* Step2: Download google word2vec to `./resources/` folder and modify `embedding_file` in `settings.ini`.
+* Step2: Download [google word2vec](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit) to `./resources/` folder and modify `embedding_file` in `settings.ini`.
 * Step3: Adjust hyper parameters in `settings.ini` if necessary.
 * Step4: Generate vocabulary file to the `./results/` folder.
 ```
