@@ -1,4 +1,5 @@
 import os
+import time
 import argparse
 import configparser
 
@@ -83,6 +84,7 @@ def train():
     data_size = len(train_dataset)
     batch_num = data_size // BATCH_SIZE + 1
     for epoch in range(1, EPOCHS + 1):
+        tic = time.time()
         # Train model.
         model.train()
         batch = 1
@@ -99,6 +101,7 @@ def train():
             batch += 1
         checkpoint_path = os.path.join(MODEL_DIR, "model_epoch_{}.ckpt".format(epoch))
         torch.save(model, checkpoint_path)
+        toc = time.time()
 
         # Test model.
         model.eval()
@@ -115,7 +118,7 @@ def train():
                 y_pred.append(i)
         accuracy = metrics.accuracy_score(y_true, y_pred)
         f1_score = metrics.f1_score(y_true, y_pred, average="macro")
-        print("epoch {}, test accuracy {}, f1-score {}".format(epoch, accuracy, f1_score))
+        print("epoch {}, use time {}s, test accuracy {}, f1-score {}".format(epoch, toc - tic, accuracy, f1_score))
 
 
 def predict(epoch_idx):
