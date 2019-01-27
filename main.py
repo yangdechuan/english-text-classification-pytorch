@@ -22,6 +22,8 @@ EMBEDDING_FILE = cfg["file"]["embedding_file"].replace("/", os.path.sep)
 MODEL_DIR = cfg["file"]["model_dir"].replace("/", os.path.sep)
 RESULT_DIR = cfg["file"]["result_dir"].replace("/", os.path.sep)
 EMBEDDING_SIZE = int(cfg["file"]["embedding_size"])
+TEXT_COL_NAME = cfg["file"]["text_col_name"]
+LABEL_COL_NAME = cfg["file"]["text_col_name"]
 
 USE_CUDA = cfg["train"]["use_cuda"].lower() == "true"
 BATCH_SIZE = int(cfg["train"]["batch_size"])
@@ -44,11 +46,15 @@ def train():
     train_dataset = CustomDataset(file=TRAIN_FILE,
                                   max_len=MAX_LEN,
                                   min_count=MIN_COUNT,
-                                  result_dir=RESULT_DIR)
+                                  result_dir=RESULT_DIR,
+                                  text_col_name=TEXT_COL_NAME,
+                                  label_col_name=LABEL_COL_NAME)
     test_dataset = CustomDataset(file=TEST_FILE,
                                  max_len=MAX_LEN,
                                  min_count=MIN_COUNT,
-                                 result_dir=RESULT_DIR)
+                                 result_dir=RESULT_DIR,
+                                 text_col_name=TEXT_COL_NAME,
+                                 label_col_name=LABEL_COL_NAME)
     train_loader = DataLoader(train_dataset,
                               batch_size=BATCH_SIZE,
                               shuffle=True)
@@ -120,7 +126,8 @@ def predict(epoch_idx):
     X, _ = load_data(PREDICT_FILE,
                      max_len=MAX_LEN,
                      min_count=MIN_COUNT,
-                     result_dir=RESULT_DIR)
+                     result_dir=RESULT_DIR,
+                     text_col_name=TEXT_COL_NAME)
     X = torch.from_numpy(X).to(device)  # (N, L)
     out = model(X)  # (N, num_classes)
     pred = out.argmax(dim=-1)  # (N, )
