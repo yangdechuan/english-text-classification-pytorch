@@ -65,7 +65,7 @@ def load_data(file,
               vocab2idx=None,
               text_col_name=None,
               label_col_name=None,
-              class_names=list()):
+              class_names=None):
     """Load texts and labels for train or test.
     Arguments:
         file: data file path.
@@ -75,27 +75,33 @@ def load_data(file,
         label_col_name: column name for label.
         class_names: list of label name.
     Returns:
+        (X, y)
         X: int64 numpy array with shape (data_size, max_len)
         y: int64 numpy array with shape (data_size, ) or None
+            If label_col_name is not None, y is numpy array.
+            If label_col_name is None, y is None.
     """
     df = pd.read_csv(file)
     x_list = []
-    for sentence in df[text_col_name]:
-        sentence = _clean_str(sentence)
-        x = [vocab2idx.get(vocab) for vocab in nltk.wordpunct_tokenize(sentence) if vocab in vocab2idx]
-        x = x[: max_len]
-        n_pad = max_len - len(x)
-        x = x + n_pad * [PAD]
-        x_list.append(x)
-    X = np.array(x_list, dtype=np.int64)
-    print("{} Data size {}".format("Train" if "train" in file else "Test", len(X)))
-
+    y_list = []
     if label_col_name:
         label2idx = {label: idx for idx, label in enumerate(class_names)}
-        y = [label2idx[label] for label in df[label_col_name].values]
-        y = np.array(y, dtype=np.int64)
-    else:
-        y = None
+    for i in range(df.shape[0]):
+        label = df[label_col_name][i]
+        if label_col_name:
+            y_list.append(label2idx[label])
+        if label_col_name is None or label in class_names:
+            sentence = df[text_col_name][i]
+            sentence = _clean_str(sentence)
+            x = [vocab2idx.get(vocab) for vocab in nltk.wordpunct_tokenize(sentence) if vocab in vocab2idx]
+            x = x[: max_len]
+            n_pad = max_len - len(x)
+            x = x + n_pad * [PAD]
+            x_list.append(x)
+
+    X = np.array(x_list, dtype=np.int64)
+    y = np.array(y_list, dtype=np.int64) if y_list else None
+    print("{} Data size {}".format("Train" if "train" in file else "Test", len(X)))
 
     return X, y
 
