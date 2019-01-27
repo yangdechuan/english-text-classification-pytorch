@@ -122,8 +122,9 @@ def train():
             # if batch % 10 == 0:
             #     print("epoch {}, batch {}/{}, train loss {}".format(epoch, batch, batch_num, loss.item()))
             batch += 1
+        model_to_save = model.module if hasattr(model, 'module') else model
         checkpoint_path = os.path.join(MODEL_DIR, "model_epoch_{}.ckpt".format(epoch))
-        torch.save(model, checkpoint_path)
+        torch.save(model_to_save, checkpoint_path)
         toc = time.time()
 
         # Test model.
@@ -154,6 +155,9 @@ def predict(epoch_idx):
 
     model = torch.load(os.path.join(MODEL_DIR, "model_epoch_{}.ckpt".format(epoch_idx)))
     model.to(device)
+
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)
 
     model.eval()
 
