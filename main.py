@@ -23,7 +23,7 @@ MODEL_DIR = cfg["file"]["model_dir"].replace("/", os.path.sep)
 RESULT_DIR = cfg["file"]["result_dir"].replace("/", os.path.sep)
 EMBEDDING_SIZE = int(cfg["file"]["embedding_size"])
 TEXT_COL_NAME = cfg["file"]["text_col_name"]
-LABEL_COL_NAME = cfg["file"]["text_col_name"]
+LABEL_COL_NAME = cfg["file"]["label_col_name"]
 
 USE_CUDA = cfg["train"]["use_cuda"].lower() == "true"
 BATCH_SIZE = int(cfg["train"]["batch_size"])
