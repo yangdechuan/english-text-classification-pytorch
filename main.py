@@ -147,6 +147,10 @@ def predict(epoch_idx):
 
     model = torch.load(os.path.join(MODEL_DIR, "model_epoch_{}.ckpt".format(epoch_idx)))
     model = model.to(device)
+
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)
+
     model.eval()
 
     X, _ = load_data(PREDICT_FILE,

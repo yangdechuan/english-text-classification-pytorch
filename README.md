@@ -19,6 +19,7 @@ python main.py --make-vocab
 ```
 * Step5: Train model.
     * Model will be saved in `./models/` folders
+    * Default Use all gpu to train mdoel. If you only want to use gpu 0, you can add `CUDA_VISIBLE_DEVICES=0` before the following instruction.
 ```
 python main.py --do-train
 ```
