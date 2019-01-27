@@ -73,9 +73,8 @@ def load_data(file, max_len=100, min_count=1, result_dir="results"):
         min_count: Vocab num less than this will be replaced with UNK.
         result_dir: vocab dict dir
     Returns:
-        X: numpy array with shape (data_size, max_len)
-        y: numpy array with shape (data_size, )
-        vocab_size: a scalar
+        X: int64 numpy array with shape (data_size, max_len)
+        y: int64 numpy array with shape (data_size, ) or None
     """
     with open(os.path.join(result_dir, "vocab.txt"), "r", encoding="utf-8") as fr:
         vocabs = [line.split()[0] for line in fr.readlines() if int(line.split()[1]) >= min_count]

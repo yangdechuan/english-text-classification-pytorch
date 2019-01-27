@@ -105,7 +105,8 @@ def train():
             for i in batch_pred.cpu().numpy():
                 y_pred.append(i)
         accuracy = metrics.accuracy_score(y_true, y_pred)
-        print("epoch {}, test accuracy {}".format(epoch, accuracy))
+        f1_score = metrics.f1_score(y_true, y_pred, average="macro")
+        print("epoch {}, test accuracy {}, f1-score {}".format(epoch, accuracy, f1_score))
 
 
 def predict(epoch_idx):
@@ -120,7 +121,7 @@ def predict(epoch_idx):
                      max_len=MAX_LEN,
                      min_count=MIN_COUNT,
                      result_dir=RESULT_DIR)
-    X = torch.LongTensor(X).to(device)  # (N, L)
+    X = torch.from_numpy(X).to(device)  # (N, L)
     out = model(X)  # (N, num_classes)
     pred = out.argmax(dim=-1)  # (N, )
     pred = pred.cpu().numpy()
