@@ -34,6 +34,7 @@ EPOCHS = int(cfg["train"]["epochs"])
 
 MAX_LEN = int(cfg["process"]["max_sentence_len"])
 MIN_COUNT = int(cfg["process"]["min_word_count"])
+DO_LOWER_CASE = cfg["process"]["do_lower_case"].lower() == "true"
 
 CLASS_NAMES = eval(cfg["file"]["class_names"])
 
@@ -64,12 +65,14 @@ def train():
     X_train, y_train = load_data(TRAIN_FILE,
                                  max_len=MAX_LEN,
                                  vocab2idx=vocab2idx,
+                                 do_lower_case=DO_LOWER_CASE,
                                  text_col_name=TEXT_COL_NAME,
                                  label_col_name=LABEL_COL_NAME,
                                  class_names=CLASS_NAMES)
     X_test, y_test = load_data(TEST_FILE,
                                max_len=MAX_LEN,
                                vocab2idx=vocab2idx,
+                               do_lower_case=DO_LOWER_CASE,
                                text_col_name=TEXT_COL_NAME,
                                label_col_name=LABEL_COL_NAME,
                                class_names=CLASS_NAMES)
@@ -162,6 +165,7 @@ def predict(epoch_idx):
     X, _ = load_data(PREDICT_FILE,
                      max_len=MAX_LEN,
                      vocab2idx=vocab2idx,
+                     do_lower_case=DO_LOWER_CASE,
                      text_col_name=TEXT_COL_NAME)
     X = torch.from_numpy(X).to(device)  # (N, L)
     out = model(X)  # (N, num_classes)
@@ -188,7 +192,10 @@ if __name__ == "__main__":
     config_log()
 
     if args.make_vocab:
-        make_vocab(train_file=TRAIN_FILE, result_dir=RESULT_DIR, text_col_name=TEXT_COL_NAME)
+        make_vocab(train_file=TRAIN_FILE,
+                   do_lower_case=DO_LOWER_CASE,
+                   result_dir=RESULT_DIR,
+                   text_col_name=TEXT_COL_NAME)
     if args.do_train:
         train()
     if args.do_predict:

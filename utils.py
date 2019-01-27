@@ -10,16 +10,19 @@ import gensim
 PAD = 0
 
 
-def _clean_str(string):
+def _clean_str(string, do_lower_case=True):
+    if do_lower_case:
+        string = string.lower()
     return string.strip()
 
 
-def make_vocab(train_file, result_dir="results", text_col_name=None):
+def make_vocab(train_file, do_lower_case=True, result_dir="results", text_col_name=None):
     """Build vocab dict.
     Write vocab and num to results/vocab.txt
 
     Arguments:
         train_file: train data file path.
+        do_lower_case: Whether to use lower case.
         result_dir: vocab dict directory.
         text_col_name: column name for text.
     """
@@ -32,7 +35,7 @@ def make_vocab(train_file, result_dir="results", text_col_name=None):
     lengths = []
     print("Making vocab...")
     for sentence in df[text_col_name]:
-        sentence = _clean_str(sentence)
+        sentence = _clean_str(sentence, do_lower_case=do_lower_case)
         # vocabs = sentence.split()
         # vocabs = nltk.word_tokenize(sentence)
         vocabs = nltk.wordpunct_tokenize(sentence)
@@ -63,6 +66,7 @@ def get_vocab(result_dir="results", min_count=1):
 def load_data(file,
               max_len=100,
               vocab2idx=None,
+              do_lower_case=True,
               text_col_name=None,
               label_col_name=None,
               class_names=None):
@@ -71,6 +75,7 @@ def load_data(file,
         file: data file path.
         max_len: Sequences longer than this will be filtered out, and shorter than this will be padded with PAD.
         vocab2idx: dict. e.g. {"hello": 1, "world": 7, ...}
+        do_lower_case: Whether to use lower case.
         text_col_name: column name for text.
         label_col_name: column name for label.
         class_names: list of label name.
@@ -92,7 +97,7 @@ def load_data(file,
             y_list.append(label2idx[label])
         if label_col_name is None or label in class_names:
             sentence = df[text_col_name][i]
-            sentence = _clean_str(sentence)
+            sentence = _clean_str(sentence, do_lower_case=do_lower_case)
             x = [vocab2idx.get(vocab) for vocab in nltk.wordpunct_tokenize(sentence) if vocab in vocab2idx]
             x = x[: max_len]
             n_pad = max_len - len(x)
