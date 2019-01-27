@@ -153,10 +153,7 @@ def predict(epoch_idx):
     device = torch.device("cuda" if torch.cuda.is_available() and USE_CUDA else "cpu")
 
     model = torch.load(os.path.join(MODEL_DIR, "model_epoch_{}.ckpt".format(epoch_idx)))
-    model = model.to(device)
-
-    if torch.cuda.device_count() > 1:
-        model = torch.nn.DataParallel(model)
+    model.to(device)
 
     model.eval()
 
