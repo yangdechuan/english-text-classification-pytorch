@@ -46,15 +46,23 @@ def make_vocab(train_file, result_dir="results", text_col_name=None):
             fw.write("{}\t{}\n".format(vocab, num))
     print("Finish making vocab!")
 
-    print("Vocab Size {}".format(len(vocab2num)))
+    print("Vocab Size of all train data {}".format(len(vocab2num)))
     print("Train Data Size {}".format(len(lengths)))
     print("Average Sentence Length {}".format(sum(lengths) / len(lengths)))
     print("Max Sentence Length {}".format(max(lengths)))
 
 
+def get_vocab(result_dir="results", min_count=1):
+    with open(os.path.join(result_dir, "vocab.txt"), "r", encoding="utf-8") as fr:
+        vocabs = [line.split()[0] for line in fr.readlines() if int(line.split()[1]) >= min_count]
+    vocab2idx = {vocab: idx for idx, vocab in enumerate(vocabs)}
+    print("used vocab size {}".format(len(vocab2idx)))
+    return vocab2idx
+
+
 def load_data(file,
-              max_len=100, min_count=1,
-              result_dir="results",
+              max_len=100,
+              vocab2idx=None,
               text_col_name=None,
               label_col_name=None,
               class_names=list()):
@@ -62,8 +70,7 @@ def load_data(file,
     Arguments:
         file: data file path.
         max_len: Sequences longer than this will be filtered out, and shorter than this will be padded with PAD.
-        min_count: Vocab num less than this will be replaced with UNK.
-        result_dir: vocab dict dir.
+        vocab2idx: dict. e.g. {"hello": 1, "world": 7, ...}
         text_col_name: column name for text.
         label_col_name: column name for label.
         class_names: list of label name.
@@ -71,10 +78,6 @@ def load_data(file,
         X: int64 numpy array with shape (data_size, max_len)
         y: int64 numpy array with shape (data_size, ) or None
     """
-    with open(os.path.join(result_dir, "vocab.txt"), "r", encoding="utf-8") as fr:
-        vocabs = [line.split()[0] for line in fr.readlines() if int(line.split()[1]) >= min_count]
-    vocab2idx = {vocab: idx for idx, vocab in enumerate(vocabs)}
-
     df = pd.read_csv(file)
     x_list = []
     for sentence in df[text_col_name]:

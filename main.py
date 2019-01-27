@@ -11,7 +11,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, TensorDataset
 
-from utils import make_vocab, load_data, load_embedding
+from utils import make_vocab, get_vocab, load_data, load_embedding
 from cnn import CNNTextModel
 from lstmattention import LSTMAttention
 
@@ -60,17 +60,16 @@ def train():
 
     # Load data.
     print("Load data...")
+    vocab2idx = get_vocab(result_dir=RESULT_DIR, min_count=MIN_COUNT)
     X_train, y_train = load_data(TRAIN_FILE,
                                  max_len=MAX_LEN,
-                                 min_count=MIN_COUNT,
-                                 result_dir=RESULT_DIR,
+                                 vocab2idx=vocab2idx,
                                  text_col_name=TEXT_COL_NAME,
                                  label_col_name=LABEL_COL_NAME,
                                  class_names=CLASS_NAMES)
     X_test, y_test = load_data(TEST_FILE,
                                max_len=MAX_LEN,
-                               min_count=MIN_COUNT,
-                               result_dir=RESULT_DIR,
+                               vocab2idx=vocab2idx,
                                text_col_name=TEXT_COL_NAME,
                                label_col_name=LABEL_COL_NAME,
                                class_names=CLASS_NAMES)
@@ -101,8 +100,10 @@ def train():
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
     # Train
-    data_size = len(train_dataset)
-    batch_num = data_size // BATCH_SIZE + 1
+    train_data_size = len(train_dataset)
+    test_data_size = len(test_dataset)
+    train_batch_num = train_data_size // BATCH_SIZE + 1
+    test_batch_num = test_data_size // BATCH_SIZE + 1
     for epoch in range(1, EPOCHS + 1):
         tic = time.time()
         # Train model.
@@ -127,11 +128,14 @@ def train():
         model.eval()
         y_true = []
         y_pred = []
+        total_loss = 0
         for batch_xs, batch_ys in test_loader:
             batch_xs = batch_xs.to(device)  # (N, L)
             batch_ys = batch_ys.to(device)  # (N, )
             batch_out = model(batch_xs)  # (N, num_classes)
             batch_pred = batch_out.argmax(dim=-1)  # (N, )
+            loss = F.cross_entropy(batch_out, batch_ys)
+            total_loss += loss.item()
             for i in batch_ys.cpu().numpy():
                 y_true.append(i)
             for i in batch_pred.cpu().numpy():
@@ -139,6 +143,7 @@ def train():
         accuracy = metrics.accuracy_score(y_true, y_pred)
         f1_score = metrics.f1_score(y_true, y_pred, average="macro")
         logging.info("epoch {}, use time {}s, test accuracy {}, f1-score {}".format(epoch, toc - tic, accuracy, f1_score))
+        logging.info("test loss {}".format(total_loss / test_batch_num))
 
 
 def predict(epoch_idx):
@@ -153,10 +158,10 @@ def predict(epoch_idx):
 
     model.eval()
 
+    vocab2idx = get_vocab(result_dir=RESULT_DIR, min_count=MIN_COUNT)
     X, _ = load_data(PREDICT_FILE,
                      max_len=MAX_LEN,
-                     min_count=MIN_COUNT,
-                     result_dir=RESULT_DIR,
+                     vocab2idx=vocab2idx,
                      text_col_name=TEXT_COL_NAME)
     X = torch.from_numpy(X).to(device)  # (N, L)
     out = model(X)  # (N, num_classes)
