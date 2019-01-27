@@ -15,18 +15,18 @@ A PyTorch Implementation of English Text Classification.
 * Step3: Adjust hyper parameters in `settings.ini` if necessary.
 * Step4: Generate vocabulary file to the `./results/` folder.
 ```
-python main.py --mode preprocess
+python main.py --make-vocab
 ```
 * Step5: Train model.
     * Model will be saved in `./models/` folders
 ```
-python main.py --mode train
+python main.py --do-train
 ```
 * Step6: Predict labels with saved model.
     * `epoch_idx` is the saved model's epoch id.
     * labels will be saved in `./results/` folder.
 ```
-python main.py --mode predict --epoch-idx 10
+python main.py --do-predict --epoch-idx 10
 ```
 
 ## File Description

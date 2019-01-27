@@ -21,7 +21,7 @@ PREDICT_FILE = cfg["file"]["predict_file"].replace("/", os.path.sep)
 EMBEDDING_FILE = cfg["file"]["embedding_file"].replace("/", os.path.sep)
 MODEL_DIR = cfg["file"]["model_dir"].replace("/", os.path.sep)
 RESULT_DIR = cfg["file"]["result_dir"].replace("/", os.path.sep)
-EMBEDDING_SIZE = cfg["file"]["embedding_size"]
+EMBEDDING_SIZE = int(cfg["file"]["embedding_size"])
 
 USE_CUDA = cfg["train"]["use_cuda"].lower() == "true"
 BATCH_SIZE = int(cfg["train"]["batch_size"])
