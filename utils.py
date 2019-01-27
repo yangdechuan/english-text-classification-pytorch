@@ -6,27 +6,11 @@ import numpy as np
 import pandas as pd
 import nltk
 import gensim
-from torch.utils.data import Dataset
 
 PAD = 0
 
 
 def _clean_str(string):
-    string = re.sub("#SemST", "", string)
-    # # # string = string.lower()
-    # string = re.sub("[^A-Za-z0-9(),!?'`]", " ", string)
-    # # string = re.sub("'s", " 's", string)
-    # # string = re.sub("'ve", " 've", string)
-    # # string = re.sub("n't", " n't", string)
-    # # string = re.sub("'re", " 're", string)
-    # # string = re.sub("'d", " 'd", string)
-    # # string = re.sub("'ll", " 'll", string)
-    # string = re.sub(",", " , ", string)
-    # string = re.sub("!", " ! ", string)
-    # string = re.sub("\(", " ( ", string)
-    # string = re.sub("\)", " ) ", string)
-    # string = re.sub("\?", " ? ", string)
-    # string = re.sub("\s{2,}", " ", string)
     return string.strip()
 
 
@@ -46,19 +30,21 @@ def make_vocab(train_file, result_dir="results", text_col_name=None):
     df = pd.read_csv(train_file)
     vocab2num = Counter()
     lengths = []
+    print("Making vocab...")
     for sentence in df[text_col_name]:
         sentence = _clean_str(sentence)
         # vocabs = sentence.split()
-        vocabs = nltk.word_tokenize(sentence)
+        # vocabs = nltk.word_tokenize(sentence)
+        vocabs = nltk.wordpunct_tokenize(sentence)
         lengths.append(len(vocabs))
         for vocab in vocabs:
             vocab = vocab.strip()
-            if vocab != "":
-                vocab2num[vocab] += 1
+            vocab2num[vocab] += 1
     with open(dic_filepath, "w", encoding="utf-8") as fw:
         fw.write("{}\t1000000000\n".format("<PAD>"))
         for vocab, num in vocab2num.most_common():
             fw.write("{}\t{}\n".format(vocab, num))
+    print("Finish making vocab!")
 
     print("Vocab Size {}".format(len(vocab2num)))
     print("Train Data Size {}".format(len(lengths)))
