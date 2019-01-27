@@ -73,7 +73,7 @@ def load_data(file, max_len=100, min_count=1, result_dir="results", text_col_nam
     x_list = []
     for sentence in df[text_col_name]:
         sentence = _clean_str(sentence)
-        x = [vocab2idx.get(vocab) for vocab in nltk.word_tokenize(sentence) if vocab in vocab2idx]
+        x = [vocab2idx.get(vocab) for vocab in nltk.wordpunct_tokenize(sentence) if vocab in vocab2idx]
         x = x[: max_len]
         n_pad = max_len - len(x)
         x = x + n_pad * [PAD]
