@@ -171,7 +171,7 @@ def predict(epoch_idx):
     loader = DataLoader(dataset, batch_size=BATCH_SIZE)
     y_pred = []
     for batch_xs in loader:
-        batch_xs = batch_xs.to(device)  # (N, L)
+        (batch_xs, ) = batch_xs.to(device)  # (N, L)
         batch_out = model(batch_xs)  # (N, num_classes)
         batch_pred = batch_out.argmax(dim=-1)  # (N, )
         for i in batch_pred.cpu().numpy():
