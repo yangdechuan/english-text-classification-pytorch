@@ -152,7 +152,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.make_vocab:
-        make_vocab(train_file=TRAIN_FILE, result_dir=RESULT_DIR)
+        make_vocab(train_file=TRAIN_FILE, result_dir=RESULT_DIR, text_col_name=TEXT_COL_NAME)
     if args.do_train:
         train()
     if args.do_predict:
