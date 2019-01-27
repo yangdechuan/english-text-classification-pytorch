@@ -100,9 +100,9 @@ def train():
             batch_ys = batch_ys.to(device)  # (N, )
             batch_out = model(batch_xs)  # (N, num_classes)
             batch_pred = batch_out.argmax(dim=-1)  # (N, )
-            for i in batch_ys.numpy():
+            for i in batch_ys.cpu().numpy():
                 y_true.append(i)
-            for i in batch_pred.numpy():
+            for i in batch_pred.cpu().numpy():
                 y_pred.append(i)
         accuracy = metrics.accuracy_score(y_true, y_pred)
         print("epoch {}, test accuracy {}".format(epoch, accuracy))
