@@ -4,7 +4,6 @@ import logging
 import os
 import time
 
-
 from sklearn import metrics
 import torch
 import torch.optim as optim
@@ -167,13 +166,19 @@ def predict(epoch_idx):
                      vocab2idx=vocab2idx,
                      do_lower_case=DO_LOWER_CASE,
                      text_col_name=TEXT_COL_NAME)
-    X = torch.from_numpy(X).to(device)  # (N, L)
-    out = model(X)  # (N, num_classes)
-    pred = out.argmax(dim=-1)  # (N, )
-    pred = pred.cpu().numpy()
+    X = torch.from_numpy(X)  # (N, L)
+    dataset = TensorDataset(X)
+    loader = DataLoader(dataset, batch_size=BATCH_SIZE)
+    y_pred = []
+    for batch_xs in loader:
+        batch_xs = batch_xs.to(device)  # (N, L)
+        batch_out = model(batch_xs)  # (N, num_classes)
+        batch_pred = batch_out.argmax(dim=-1)  # (N, )
+        for i in batch_pred.cpu().numpy():
+            y_pred.append(i)
 
     with open(os.path.join(RESULT_DIR, "predict.txt"), "w", encoding="utf-8") as fw:
-        for i in pred:
+        for i in y_pred:
             fw.write(str(CLASS_NAMES[i]) + "\n")
 
 
