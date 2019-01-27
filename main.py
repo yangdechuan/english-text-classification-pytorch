@@ -8,12 +8,12 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
-from utils import CustomDataset, make_data, load_data, load_embedding
+from utils import CustomDataset, make_vocab, load_data, load_embedding
 from cnn import CNNTextModel
-from lstmattention import LSTMAttention
+# from lstmattention import LSTMAttention
 
 cfg = configparser.ConfigParser()
-cfg.read("settings.ini")
+cfg.read("settings.ini", encoding="utf-8")
 
 TRAIN_FILE = cfg["file"]["train_file"].replace("/", os.path.sep)
 TEST_FILE = cfg["file"]["test_file"].replace("/", os.path.sep)
@@ -21,8 +21,9 @@ PREDICT_FILE = cfg["file"]["predict_file"].replace("/", os.path.sep)
 EMBEDDING_FILE = cfg["file"]["embedding_file"].replace("/", os.path.sep)
 MODEL_DIR = cfg["file"]["model_dir"].replace("/", os.path.sep)
 RESULT_DIR = cfg["file"]["result_dir"].replace("/", os.path.sep)
+EMBEDDING_SIZE = cfg["file"]["embedding_size"]
 
-USE_CUDA = cfg["train"]["cuda"].lower() == "true"
+USE_CUDA = cfg["train"]["use_cuda"].lower() == "true"
 BATCH_SIZE = int(cfg["train"]["batch_size"])
 EPOCHS = int(cfg["train"]["epochs"])
 
@@ -53,12 +54,15 @@ def train():
                               shuffle=True)
     test_loader = DataLoader(test_dataset,
                              batch_size=BATCH_SIZE)
-    word_embedding = load_embedding(EMBEDDING_FILE, min_count=MIN_COUNT, result_dir=RESULT_DIR)
+    word_embedding = load_embedding(EMBEDDING_FILE,
+                                    embedding_size=EMBEDDING_SIZE,
+                                    min_count=MIN_COUNT,
+                                    result_dir=RESULT_DIR)
     print("Load data success.")
 
     # Build model.
-    # model = CNNTextModel(word_embedding=word_embedding, num_classes=NUM_CLASSES)
-    model = LSTMAttention(word_embedding=word_embedding, hidden_dim=word_embedding.shape[1], num_classes=NUM_CLASSES)
+    model = CNNTextModel(word_embedding=word_embedding, num_classes=NUM_CLASSES)
+    # model = LSTMAttention(word_embedding=word_embedding, hidden_dim=word_embedding.shape[1], num_classes=NUM_CLASSES)
     model.to(device)
 
     # Build optimizer
@@ -128,14 +132,20 @@ def predict(epoch_idx):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", type=str, default="preprocess", choices=["preprocess", "train", "predict"])
-    parser.add_argument("--epoch-idx", type=int, default=1)
+    parser.add_argument("--make-vocab", action="store_true",
+                        help="Set this flag if you want to make vocab from train data.")
+    parser.add_argument("--do-train", action="store_true",
+                        help="Whether to run training.")
+    parser.add_argument("--do-predict", action="store_true",
+                        help="Whether to run prediction.")
+    parser.add_argument("--epoch-idx", type=int, default=1,
+                        help="Choose which model to predict.")
 
     args = parser.parse_args()
 
-    if args.mode == "preprocess":
-        make_data(train_file=TRAIN_FILE, result_dir=RESULT_DIR)
-    elif args.mode == "train":
+    if args.make_vocab:
+        make_vocab(train_file=TRAIN_FILE, result_dir=RESULT_DIR)
+    if args.do_train:
         train()
-    else:
+    if args.do_predict:
         predict(args.epoch_idx)

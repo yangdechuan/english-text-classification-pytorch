@@ -9,7 +9,6 @@ import gensim
 from torch.utils.data import Dataset
 
 PAD = 0
-EMBEDDING_SIZE = 300
 
 
 def _clean_str(string):
@@ -31,7 +30,7 @@ def _clean_str(string):
     return string.strip()
 
 
-def make_data(train_file, result_dir="results"):
+def make_vocab(train_file, result_dir="results"):
     """Build vocab dict.
     Write vocab and num to results/vocab.txt
 
@@ -44,8 +43,6 @@ def make_data(train_file, result_dir="results"):
     dic_filepath = os.path.join(result_dir, "vocab.txt")
 
     df = pd.read_csv(train_file)
-    # df = df.loc[df["label"] != 2, :]
-    # df = df.loc[df["Target"] == "Feminist Movement", :]
     vocab2num = Counter()
     lengths = []
     for sentence in df["sentence"]:
@@ -85,8 +82,6 @@ def load_data(file, max_len=100, min_count=1, result_dir="results"):
     vocab2idx = {vocab: idx for idx, vocab in enumerate(vocabs)}
 
     df = pd.read_csv(file)
-    # df = df.loc[df["label"] != 2, :]
-    # df = df.loc[df["Target"] == "Feminist Movement", :]
     x_list = []
     for sentence in df["sentence"]:
         sentence = _clean_str(sentence)
@@ -98,12 +93,12 @@ def load_data(file, max_len=100, min_count=1, result_dir="results"):
     X = np.array(x_list, dtype=np.int64)
     print("{} Data size {}".format("Train" if "train" in file else "Test", len(X)))
 
-    y = df["label"].values
-    y = np.array(y, dtype=np.int64)
+    y = df["label"].values.astype(np.int64) if "label" in df.columns else None
+
     return X, y
 
 
-def load_embedding(embedding_file, min_count=1, result_dir="results"):
+def load_embedding(embedding_file, embedding_size=300, min_count=1, result_dir="results"):
     try:
         word2vec = gensim.models.KeyedVectors.load_word2vec_format(embedding_file, binary=True)
     except Exception:
@@ -112,13 +107,13 @@ def load_embedding(embedding_file, min_count=1, result_dir="results"):
         vocabs = [line.split()[0] for line in fr.readlines() if int(line.split()[1]) >= min_count]
     idx2vocab = {idx: vocab for idx, vocab in enumerate(vocabs)}
     vocab_size = len(idx2vocab)
-    word_embedding = np.zeros((vocab_size, EMBEDDING_SIZE), dtype=np.float32)
+    word_embedding = np.zeros((vocab_size, embedding_size), dtype=np.float32)
     for idx in range(1, vocab_size):
         try:
             vocab = idx2vocab[idx]
             word_embedding[idx] = word2vec[vocab]
         except KeyError:
-            word_embedding[idx] = np.random.randn(EMBEDDING_SIZE)
+            word_embedding[idx] = np.random.randn(embedding_size)
     return word_embedding
 
 
