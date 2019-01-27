@@ -32,7 +32,7 @@ EPOCHS = int(cfg["train"]["epochs"])
 MAX_LEN = int(cfg["process"]["max_sentence_len"])
 MIN_COUNT = int(cfg["process"]["min_word_count"])
 
-NUM_CLASSES = int(cfg["model"]["num_classes"])
+CLASS_NAMES = eval(cfg["file"]["class_names"])
 
 
 def train():
@@ -48,13 +48,15 @@ def train():
                                  min_count=MIN_COUNT,
                                  result_dir=RESULT_DIR,
                                  text_col_name=TEXT_COL_NAME,
-                                 label_col_name=LABEL_COL_NAME)
+                                 label_col_name=LABEL_COL_NAME,
+                                 class_names=CLASS_NAMES)
     X_test, y_test = load_data(TEST_FILE,
                                max_len=MAX_LEN,
                                min_count=MIN_COUNT,
                                result_dir=RESULT_DIR,
                                text_col_name=TEXT_COL_NAME,
-                               label_col_name=LABEL_COL_NAME)
+                               label_col_name=LABEL_COL_NAME,
+                               class_names=CLASS_NAMES)
     train_dataset = TensorDataset(torch.from_numpy(X_train), torch.from_numpy(y_train))
     test_dataset = TensorDataset(torch.from_numpy(X_test), torch.from_numpy(y_test))
 
@@ -70,7 +72,7 @@ def train():
     print("Load data success.")
 
     # Build model.
-    model = CNNTextModel(word_embedding=word_embedding, num_classes=NUM_CLASSES)
+    model = CNNTextModel(word_embedding=word_embedding, num_classes=len(CLASS_NAMES))
     # model = LSTMAttention(word_embedding=word_embedding, hidden_dim=word_embedding.shape[1], num_classes=NUM_CLASSES)
     model.to(device)
 

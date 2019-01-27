@@ -52,7 +52,12 @@ def make_vocab(train_file, result_dir="results", text_col_name=None):
     print("Max Sentence Length {}".format(max(lengths)))
 
 
-def load_data(file, max_len=100, min_count=1, result_dir="results", text_col_name=None, label_col_name=None):
+def load_data(file,
+              max_len=100, min_count=1,
+              result_dir="results",
+              text_col_name=None,
+              label_col_name=None,
+              class_names=list()):
     """Load texts and labels for train or test.
     Arguments:
         file: data file path.
@@ -61,6 +66,7 @@ def load_data(file, max_len=100, min_count=1, result_dir="results", text_col_nam
         result_dir: vocab dict dir.
         text_col_name: column name for text.
         label_col_name: column name for label.
+        class_names: list of label name.
     Returns:
         X: int64 numpy array with shape (data_size, max_len)
         y: int64 numpy array with shape (data_size, ) or None
@@ -81,7 +87,12 @@ def load_data(file, max_len=100, min_count=1, result_dir="results", text_col_nam
     X = np.array(x_list, dtype=np.int64)
     print("{} Data size {}".format("Train" if "train" in file else "Test", len(X)))
 
-    y = df[label_col_name].values.astype(np.int64) if label_col_name in df.columns else None
+    if label_col_name:
+        label2idx = {label: idx for idx, label in enumerate(class_names)}
+        y = [label2idx[label] for label in df[label_col_name].values]
+        y = np.array(y, dtype=np.int64)
+    else:
+        y = None
 
     return X, y
 
