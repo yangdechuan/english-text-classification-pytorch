@@ -137,8 +137,8 @@ def predict(epoch_idx):
     pred = pred.cpu().numpy()
 
     with open(os.path.join(RESULT_DIR, "predict.txt"), "w", encoding="utf-8") as fw:
-        for label in pred:
-            fw.write(str(label) + "\n")
+        for i in pred:
+            fw.write(str(CLASS_NAMES[i]) + "\n")
 
 
 if __name__ == "__main__":
