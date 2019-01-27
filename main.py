@@ -107,10 +107,10 @@ def train():
     train_batch_num = train_data_size // BATCH_SIZE + 1
     test_batch_num = test_data_size // BATCH_SIZE + 1
     for epoch in range(1, EPOCHS + 1):
-        tic = time.time()
         # Train model.
         model.train()
         batch = 1
+        tic = time.time()
         for batch_xs, batch_ys in train_loader:
             batch_xs = batch_xs.to(device)  # (N, L)
             batch_ys = batch_ys.to(device)  # (N, )
@@ -122,10 +122,12 @@ def train():
             # if batch % 10 == 0:
             #     print("epoch {}, batch {}/{}, train loss {}".format(epoch, batch, batch_num, loss.item()))
             batch += 1
+        toc = time.time()
+
+        # Save nn.Module rather than nn.DataParallel.
         model_to_save = model.module if hasattr(model, 'module') else model
         checkpoint_path = os.path.join(MODEL_DIR, "model_epoch_{}.ckpt".format(epoch))
         torch.save(model_to_save, checkpoint_path)
-        toc = time.time()
 
         # Test model.
         model.eval()
