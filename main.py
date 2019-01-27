@@ -93,6 +93,10 @@ def train():
     # model = LSTMAttention(word_embedding=word_embedding, hidden_dim=word_embedding.shape[1], num_classes=NUM_CLASSES)
     model.to(device)
 
+    # Use data parallel.
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)
+
     # Build optimizer
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
