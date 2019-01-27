@@ -6,11 +6,11 @@ from sklearn import metrics
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 
-from utils import CustomDataset, make_vocab, load_data, load_embedding
+from utils import make_vocab, load_data, load_embedding
 from cnn import CNNTextModel
-# from lstmattention import LSTMAttention
+from lstmattention import LSTMAttention
 
 cfg = configparser.ConfigParser()
 cfg.read("settings.ini", encoding="utf-8")
@@ -43,18 +43,21 @@ def train():
 
     # Load data.
     print("Load data...")
-    train_dataset = CustomDataset(file=TRAIN_FILE,
-                                  max_len=MAX_LEN,
-                                  min_count=MIN_COUNT,
-                                  result_dir=RESULT_DIR,
-                                  text_col_name=TEXT_COL_NAME,
-                                  label_col_name=LABEL_COL_NAME)
-    test_dataset = CustomDataset(file=TEST_FILE,
+    X_train, y_train = load_data(TRAIN_FILE,
                                  max_len=MAX_LEN,
                                  min_count=MIN_COUNT,
                                  result_dir=RESULT_DIR,
                                  text_col_name=TEXT_COL_NAME,
                                  label_col_name=LABEL_COL_NAME)
+    X_test, y_test = load_data(TEST_FILE,
+                               max_len=MAX_LEN,
+                               min_count=MIN_COUNT,
+                               result_dir=RESULT_DIR,
+                               text_col_name=TEXT_COL_NAME,
+                               label_col_name=LABEL_COL_NAME)
+    train_dataset = TensorDataset(torch.from_numpy(X_train), torch.from_numpy(y_train))
+    test_dataset = TensorDataset(torch.from_numpy(X_test), torch.from_numpy(y_test))
+
     train_loader = DataLoader(train_dataset,
                               batch_size=BATCH_SIZE,
                               shuffle=True)
@@ -81,8 +84,6 @@ def train():
         # Train model.
         model.train()
         batch = 1
-        # if epoch < 1:
-        #     model.word_embedding.weight.requires_grad = True
         for batch_xs, batch_ys in train_loader:
             batch_xs = batch_xs.to(device)  # (N, L)
             batch_ys = batch_ys.to(device)  # (N, )

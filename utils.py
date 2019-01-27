@@ -117,26 +117,3 @@ def load_embedding(embedding_file, embedding_size=300, min_count=1, result_dir="
         except KeyError:
             word_embedding[idx] = np.random.randn(embedding_size)
     return word_embedding
-
-
-class CustomDataset(Dataset):
-    """Custom Dataset for PyTorch."""
-    def __init__(self, file,
-                 max_len=100,
-                 min_count=1,
-                 result_dir="results",
-                 text_col_name=None,
-                 label_col_name=None):
-        super(CustomDataset, self).__init__()
-        self.X, self.y = load_data(file,
-                                   max_len=max_len,
-                                   min_count=min_count,
-                                   result_dir=result_dir,
-                                   text_col_name=text_col_name,
-                                   label_col_name=label_col_name)
-
-    def __getitem__(self, index):
-        return self.X[index], self.y[index]
-
-    def __len__(self):
-        return self.X.shape[0]
