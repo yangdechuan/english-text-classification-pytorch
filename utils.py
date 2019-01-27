@@ -92,17 +92,18 @@ def load_data(file,
     if label_col_name:
         label2idx = {label: idx for idx, label in enumerate(class_names)}
     for i in range(df.shape[0]):
-        label = df[label_col_name][i]
+        if label_col_name and df[label_col_name][i] not in class_names:
+            continue
         if label_col_name:
+            label = df[label_col_name][i]
             y_list.append(label2idx[label])
-        if label_col_name is None or label in class_names:
-            sentence = df[text_col_name][i]
-            sentence = _clean_str(sentence, do_lower_case=do_lower_case)
-            x = [vocab2idx.get(vocab) for vocab in nltk.wordpunct_tokenize(sentence) if vocab in vocab2idx]
-            x = x[: max_len]
-            n_pad = max_len - len(x)
-            x = x + n_pad * [PAD]
-            x_list.append(x)
+        sentence = df[text_col_name][i]
+        sentence = _clean_str(sentence, do_lower_case=do_lower_case)
+        x = [vocab2idx.get(vocab) for vocab in nltk.wordpunct_tokenize(sentence) if vocab in vocab2idx]
+        x = x[: max_len]
+        n_pad = max_len - len(x)
+        x = x + n_pad * [PAD]
+        x_list.append(x)
 
     X = np.array(x_list, dtype=np.int64)
     y = np.array(y_list, dtype=np.int64) if y_list else None
