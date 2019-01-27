@@ -1,7 +1,9 @@
-import os
-import time
 import argparse
 import configparser
+import logging
+import os
+import time
+
 
 from sklearn import metrics
 import torch
@@ -34,6 +36,20 @@ MAX_LEN = int(cfg["process"]["max_sentence_len"])
 MIN_COUNT = int(cfg["process"]["min_word_count"])
 
 CLASS_NAMES = eval(cfg["file"]["class_names"])
+
+
+def config_log():
+    """Config logging."""
+    s_handler = logging.StreamHandler()
+    s_handler.setLevel(logging.INFO)
+    info_handler = logging.FileHandler(filename=os.path.join(RESULT_DIR, "log.txt"), mode="w", encoding="utf-8")
+    info_handler.setLevel(level=logging.INFO)
+
+    logging.basicConfig(level=logging.INFO,
+                        datefmt="%H:%M:%M",
+                        format="{asctime} [{levelname}]>> {message}",
+                        style="{",
+                        handlers=[s_handler, info_handler])
 
 
 def train():
@@ -118,7 +134,7 @@ def train():
                 y_pred.append(i)
         accuracy = metrics.accuracy_score(y_true, y_pred)
         f1_score = metrics.f1_score(y_true, y_pred, average="macro")
-        print("epoch {}, use time {}s, test accuracy {}, f1-score {}".format(epoch, toc - tic, accuracy, f1_score))
+        logging.info("epoch {}, use time {}s, test accuracy {}, f1-score {}".format(epoch, toc - tic, accuracy, f1_score))
 
 
 def predict(epoch_idx):
@@ -152,10 +168,11 @@ if __name__ == "__main__":
                         help="Whether to run training.")
     parser.add_argument("--do-predict", action="store_true",
                         help="Whether to run prediction.")
-    parser.add_argument("--epoch-idx", type=int, default=1,
+    parser.add_argument("--epoch-idx", type=int, default=EPOCHS,
                         help="Choose which model to predict.")
-
     args = parser.parse_args()
+
+    config_log()
 
     if args.make_vocab:
         make_vocab(train_file=TRAIN_FILE, result_dir=RESULT_DIR, text_col_name=TEXT_COL_NAME)
