@@ -125,8 +125,8 @@ class CustomDataset(Dataset):
                  max_len=100,
                  min_count=1,
                  result_dir="results",
-                 text_col_name = "sentence",
-                 label_col_name = "label"):
+                 text_col_name=None,
+                 label_col_name=None):
         super(CustomDataset, self).__init__()
         self.X, self.y = load_data(file,
                                    max_len=max_len,
