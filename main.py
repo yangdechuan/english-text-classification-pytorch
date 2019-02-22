@@ -106,6 +106,7 @@ def train():
     test_data_size = len(test_dataset)
     train_batch_num = train_data_size // BATCH_SIZE + 1
     test_batch_num = test_data_size // BATCH_SIZE + 1
+    print("Training...")
     for epoch in range(1, EPOCHS + 1):
         # Train model.
         model.train()
@@ -149,6 +150,7 @@ def train():
         f1_score = metrics.f1_score(y_true, y_pred, average="macro")
         logging.info("epoch {}, use time {}s, test accuracy {}, f1-score {}".format(epoch, toc - tic, accuracy, f1_score))
         logging.info("test loss {}".format(total_loss / test_batch_num))
+    print("Finish training!")
 
 
 def predict(epoch_idx):
