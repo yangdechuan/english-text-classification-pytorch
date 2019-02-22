@@ -42,7 +42,7 @@ def config_log():
     """Config logging."""
     s_handler = logging.StreamHandler()
     s_handler.setLevel(logging.INFO)
-    info_handler = logging.FileHandler(filename=os.path.join(RESULT_DIR, "log.txt"), mode="w", encoding="utf-8")
+    info_handler = logging.FileHandler("log.txt", mode="w", encoding="utf-8")
     info_handler.setLevel(level=logging.INFO)
 
     logging.basicConfig(level=logging.INFO,
