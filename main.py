@@ -127,6 +127,7 @@ def train():
 
         # Save nn.Module rather than nn.DataParallel.
         model_to_save = model.module if hasattr(model, 'module') else model
+        model_to_save = model_to_save.cpu()
         checkpoint_path = os.path.join(MODEL_DIR, "model_epoch_{}.ckpt".format(epoch))
         torch.save(model_to_save.state_dict(), checkpoint_path)
 
