@@ -127,7 +127,6 @@ def train():
 
         # Save nn.Module rather than nn.DataParallel.
         model_to_save = model.module if hasattr(model, 'module') else model
-        model_to_save = model_to_save.cpu()
         checkpoint_path = os.path.join(MODEL_DIR, "model_epoch_{}.ckpt".format(epoch))
         torch.save(model_to_save.state_dict(), checkpoint_path)
 
@@ -164,7 +163,7 @@ def predict(epoch_idx):
                                     result_dir=RESULT_DIR)
     model = CNNTextModel(word_embedding=word_embedding, num_classes=len(CLASS_NAMES))
     checkpoint_path = os.path.join(MODEL_DIR, "model_epoch_{}.ckpt".format(epoch_idx))
-    model.load_state_dict(torch.load(checkpoint_path))
+    model.load_state_dict(torch.load(checkpoint_path, map_location="cpu"))
     model.to(device)
 
     if torch.cuda.device_count() > 1:
