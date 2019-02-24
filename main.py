@@ -42,16 +42,20 @@ def config_log():
     """Config logging."""
     global logger
     logger = logging.getLogger("cnn")
+    logger.setLevel(logging.INFO)
+
     s_handler = logging.StreamHandler()
     s_handler.setLevel(logging.INFO)
     info_handler = logging.FileHandler("log.txt", mode="w", encoding="utf-8")
     info_handler.setLevel(level=logging.INFO)
 
-    logger.basicConfig(level=logging.INFO,
-                       datefmt="%H:%M:%M",
-                       format="{asctime} [{levelname}]>> {message}",
-                       style="{",
-                       handlers=[s_handler, info_handler])
+    formatter = logging.Formatter('%(asctime)s – %(name)s – %(levelname)s – %(message)s')
+    s_handler.setFormatter(formatter)
+    info_handler.setFormatter(formatter)
+
+    logger.addHandler(s_handler)
+    logger.addHandler(info_handler)
+
     return logger
 
 
