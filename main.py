@@ -50,7 +50,7 @@ def config_log():
     info_handler = logging.FileHandler("log.txt", mode="w", encoding="utf-8")
     info_handler.setLevel(level=logging.INFO)
 
-    formatter = logging.Formatter('%(asctime)s – %(name)s – %(levelname)s – %(message)s')
+    formatter = logging.Formatter('%(asctime)s – %(levelname)s – %(message)s')
     s_handler.setFormatter(formatter)
     info_handler.setFormatter(formatter)
 
@@ -157,7 +157,8 @@ def train(logger=None):
                 y_pred.append(i)
         accuracy = metrics.accuracy_score(y_true, y_pred)
         f1_score = metrics.f1_score(y_true, y_pred, average="macro")
-        logger.info("epoch {}, use time {}s, test accuracy {}, f1-score {}".format(epoch, toc - tic, accuracy, f1_score))
+        logger.info("epoch {}".format(epoch))
+        logger.info("use time {}s, test accuracy {}, f1-score {}".format(toc - tic, accuracy, f1_score))
         logger.info("test loss {}".format(total_loss / test_batch_num))
     print("Finish training!")
 
@@ -185,12 +186,16 @@ def predict(epoch_idx, logger=None):
     dataset = TensorDataset(X)
     loader = DataLoader(dataset, batch_size=BATCH_SIZE)
     y_pred = []
+    print("Start predicting...")
+    tic = time.time()
     for (batch_xs, ) in loader:
         batch_xs = batch_xs.to(device)  # (N, L)
         batch_out = model(batch_xs)  # (N, num_classes)
         batch_pred = batch_out.argmax(dim=-1)  # (N, )
         for i in batch_pred.cpu().numpy():
             y_pred.append(i)
+    toc = time.time()
+    logger.info("predict use time {}s".format(toc - tic))
 
     with open(os.path.join(RESULT_DIR, "predict.txt"), "w", encoding="utf-8") as fw:
         for i in y_pred:
