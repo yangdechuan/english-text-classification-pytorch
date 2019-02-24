@@ -40,19 +40,22 @@ CLASS_NAMES = eval(cfg["file"]["class_names"])
 
 def config_log():
     """Config logging."""
+    global logger
+    logger = logging.getLogger("cnn")
     s_handler = logging.StreamHandler()
     s_handler.setLevel(logging.INFO)
     info_handler = logging.FileHandler("log.txt", mode="w", encoding="utf-8")
     info_handler.setLevel(level=logging.INFO)
 
-    logging.basicConfig(level=logging.INFO,
-                        datefmt="%H:%M:%M",
-                        format="{asctime} [{levelname}]>> {message}",
-                        style="{",
-                        handlers=[s_handler, info_handler])
+    logger.basicConfig(level=logging.INFO,
+                       datefmt="%H:%M:%M",
+                       format="{asctime} [{levelname}]>> {message}",
+                       style="{",
+                       handlers=[s_handler, info_handler])
+    return logger
 
 
-def train():
+def train(logger=None):
     device = torch.device("cuda" if torch.cuda.is_available() and USE_CUDA else "cpu")
 
     if not os.path.exists(MODEL_DIR):
@@ -149,12 +152,12 @@ def train():
                 y_pred.append(i)
         accuracy = metrics.accuracy_score(y_true, y_pred)
         f1_score = metrics.f1_score(y_true, y_pred, average="macro")
-        logging.info("epoch {}, use time {}s, test accuracy {}, f1-score {}".format(epoch, toc - tic, accuracy, f1_score))
-        logging.info("test loss {}".format(total_loss / test_batch_num))
+        logger.info("epoch {}, use time {}s, test accuracy {}, f1-score {}".format(epoch, toc - tic, accuracy, f1_score))
+        logger.info("test loss {}".format(total_loss / test_batch_num))
     print("Finish training!")
 
 
-def predict(epoch_idx):
+def predict(epoch_idx, logger=None):
     """Load model in `models` and predict."""
     device = torch.device("cuda" if torch.cuda.is_available() and USE_CUDA else "cpu")
 
@@ -201,7 +204,7 @@ if __name__ == "__main__":
                         help="Choose which model to predict.")
     args = parser.parse_args()
 
-    config_log()
+    logger = config_log()
 
     if args.make_vocab:
         make_vocab(train_file=TRAIN_FILE,
@@ -209,6 +212,6 @@ if __name__ == "__main__":
                    result_dir=RESULT_DIR,
                    text_col_name=TEXT_COL_NAME)
     if args.do_train:
-        train()
+        train(logger=logger)
     if args.do_predict:
-        predict(args.epoch_idx)
+        predict(args.epoch_idx, logger=logger)
