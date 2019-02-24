@@ -30,6 +30,7 @@ LABEL_COL_NAME = cfg["file"]["label_col_name"]
 USE_CUDA = cfg["train"]["use_cuda"].lower() == "true"
 BATCH_SIZE = int(cfg["train"]["batch_size"])
 EPOCHS = int(cfg["train"]["epochs"])
+LEARNING_RATE = float(cfg["train"]["learning_rate"])
 
 MAX_LEN = int(cfg["process"]["max_sentence_len"])
 MIN_COUNT = int(cfg["process"]["min_word_count"])
@@ -106,7 +107,7 @@ def train(logger=None):
         model = torch.nn.DataParallel(model)
 
     # Build optimizer
-    optimizer = optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
     # Train
     train_data_size = len(train_dataset)
