@@ -12,9 +12,9 @@ import torch.optim as optim
 class CNNTextModel(nn.Module):
     def __init__(self, word_embedding, num_classes):
         super(CNNTextModel, self).__init__()
-        vocab_size = word_embedding.shape[0]
         embedding_dim = word_embedding.shape[1]
-        self.word_embedding = nn.Embedding(vocab_size, embedding_dim).from_pretrained(torch.Tensor(word_embedding), freeze=False)
+        self.word_embedding = nn.Embedding.from_pretrained(torch.Tensor(word_embedding),
+                                                           freeze=False)
         self.conv13 = nn.Conv2d(1, 100, kernel_size=(3, embedding_dim))
         self.conv14 = nn.Conv2d(1, 100, kernel_size=(4, embedding_dim))
         self.conv15 = nn.Conv2d(1, 100, kernel_size=(5, embedding_dim))

@@ -11,9 +11,8 @@ import torch.nn.functional as F
 class LSTMAttention(nn.Module):
     def __init__(self, word_embedding, hidden_dim, num_classes):
         super(LSTMAttention, self).__init__()
-        vocab_size = word_embedding.shape[0]
         embedding_dim = word_embedding.shape[1]
-        self.word_embedding = nn.Embedding(vocab_size, embedding_dim).from_pretrained(torch.Tensor(word_embedding), freeze=True)
+        self.word_embedding = nn.Embedding.from_pretrained(torch.Tensor(word_embedding), freeze=True)
         self.bilstm = nn.LSTM(input_size=embedding_dim,
                               hidden_size=hidden_dim // 2,
                               num_layers=1,
