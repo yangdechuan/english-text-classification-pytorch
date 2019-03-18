@@ -120,7 +120,7 @@ def load_embedding(embedding_file, vocab2idx):
     vocab_size = len(vocab2idx)
     embedding_size = word2vec.vector_size
     word_embedding = np.zeros((vocab_size, embedding_size), dtype=np.float32)
-    idx2vocab = {idx: vocab for vocab, idx in vocab2idx.item()}
+    idx2vocab = {idx: vocab for vocab, idx in vocab2idx.items()}
 
     for idx in range(1, vocab_size):
         vocab = idx2vocab[idx]

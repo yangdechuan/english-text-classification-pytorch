@@ -46,7 +46,7 @@ def config_log():
 
     s_handler = logging.StreamHandler()
     s_handler.setLevel(logging.INFO)
-    info_handler = logging.FileHandler("log.txt", mode="w", encoding="utf-8")
+    info_handler = logging.FileHandler("log.txt", mode="a", encoding="utf-8")
     info_handler.setLevel(level=logging.INFO)
 
     formatter = logging.Formatter('%(asctime)s – %(levelname)s – %(message)s')
