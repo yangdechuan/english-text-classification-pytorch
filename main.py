@@ -23,7 +23,6 @@ PREDICT_FILE = cfg["file"]["predict_file"].replace("/", os.path.sep)
 EMBEDDING_FILE = cfg["file"]["embedding_file"].replace("/", os.path.sep)
 MODEL_DIR = cfg["file"]["model_dir"].replace("/", os.path.sep)
 RESULT_DIR = cfg["file"]["result_dir"].replace("/", os.path.sep)
-EMBEDDING_SIZE = int(cfg["file"]["embedding_size"])
 TEXT_COL_NAME = cfg["file"]["text_col_name"]
 LABEL_COL_NAME = cfg["file"]["label_col_name"]
 
@@ -91,10 +90,7 @@ def train(logger=None):
                               shuffle=True)
     test_loader = DataLoader(test_dataset,
                              batch_size=BATCH_SIZE)
-    word_embedding = load_embedding(EMBEDDING_FILE,
-                                    embedding_size=EMBEDDING_SIZE,
-                                    min_count=MIN_COUNT,
-                                    result_dir=RESULT_DIR)
+    word_embedding = load_embedding(EMBEDDING_FILE, vocab2idx)
     print("Load data success.")
 
     # Build model.

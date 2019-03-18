@@ -112,20 +112,22 @@ def load_data(file,
     return X, y
 
 
-def load_embedding(embedding_file, embedding_size=300, min_count=1, result_dir="results"):
-    try:
+def load_embedding(embedding_file, vocab2idx):
+    if embedding_file[-4: ] == ".bin":
         word2vec = gensim.models.KeyedVectors.load_word2vec_format(embedding_file, binary=True)
-    except Exception:
+    else:
         word2vec = gensim.models.KeyedVectors.load_word2vec_format(embedding_file, binary=False)
-    with open(os.path.join(result_dir, "vocab.txt"), "r", encoding="utf-8") as fr:
-        vocabs = [line.split()[0] for line in fr.readlines() if int(line.split()[1]) >= min_count]
-    idx2vocab = {idx: vocab for idx, vocab in enumerate(vocabs)}
-    vocab_size = len(idx2vocab)
+    vocab_size = len(vocab2idx)
+    embedding_size = word2vec.vector_size
     word_embedding = np.zeros((vocab_size, embedding_size), dtype=np.float32)
+    idx2vocab = {idx: vocab for vocab, idx in vocab2idx.item()}
+
     for idx in range(1, vocab_size):
+        vocab = idx2vocab[idx]
         try:
-            vocab = idx2vocab[idx]
             word_embedding[idx] = word2vec[vocab]
         except KeyError:
             word_embedding[idx] = np.random.randn(embedding_size)
+
     return word_embedding
+
